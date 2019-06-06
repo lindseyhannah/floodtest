@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- the mapbox libraries -->
+	
+	<meta charset='utf-8' />
+    <title>NYC Flood Map</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+	<div id="map" style="width: 800px; height: 800px;" class="mapboxgl-map"></div> 
+	</style>
+
+</head>
+<body>
+<style>
+	#menu {
+		background: #fff;
+		position: absolute;
+		z-index: 1;
+		top: 10px;
+		left: 10px;
+		border-radius: 3px;
+		width: 120px;
+		border: 1px solid rgba(0,0,0,0.4);
+		font-family: 'Open Sans', sans-serif;
+		}
+ 
+	#menu a {
+		font-size: 13px;
+		color: #404040;
+		display: block;
+		margin: 0;
+		padding: 0;
+		padding: 10px;
+		text-decoration: none;
+		border-bottom: 1px solid rgba(0,0,0,0.25);
+		text-align: center;
+		}
+ 
+	#menu a:last-child {
+		border: none;
+		}
+ 
+	#menu a:hover {
+		background-color: #f8f8f8;
+		color: #404040;
+		}
+ 
+	#menu a.active {
+		background-color: #9e9da5;
+		color: #ffffff;
+		}
+ 
+	#menu a.active:hover {
+		background: #961239;
+		}
+</style>
+ 
+<nav id="menu"></nav>
+<div id='map'></div>
+
+<script>
+
+	mapboxgl.accessToken = 'pk.eyJ1IjoibG1oYW5uYWgiLCJhIjoiY2pvNHYzNnZ4MDBuNjNxcHUwZzR3dmR5bSJ9.c2ULzGUVCYiPhkvdiqTRZw';
+		var map = new mapboxgl.Map({
+			container: 'map',
+			style: 'mapbox://styles/lmhannah/cjwk7wtt976np1cmpvlm63cc1',
+			zoom: 9.8,
+			center: [-73.913709, 40.701839]
+		});
+
+		map.on('load', function(){
+			map.addSource('Sandy', {
+				"type": "geojson",
+				"data": "convertSandy.json"
+			});
+			map.addSource('500YrFlood2050', {
+				"type": "geojson",
+				"data": "500yr2050.json"
+			});
+			map.addSource('100YrFlood2050', {
+				"type": "geojson",
+				"data": "100yr2050.json"
+			});
+			map.addLayer({
+				"id":"100 Year Flood",
+				"type": "fill",
+				"source": "100YrFlood2050",
+				"layout":{
+					'visibility': 'none'
+				},
+				"paint": {
+					"fill-color": "#edf8fb",
+					'fill-opacity':0.7
+					} 
+
+			});
+			map.addLayer({
+				"id":"500 Year Flood",
+				"type": "fill",
+				"source": "500YrFlood2050",
+				"layout":{
+					'visibility': 'none'
+				},
+				'paint': {
+					'fill-color': "#a7e2ad",
+					'fill-opacity':0.7
+					} 
+
+			});
+			map.addLayer({
+				"id":"Sandy Innundation Zone",
+				"type": "fill",
+				"source": "Sandy",
+				"layout":{
+					'visibility': 'visible'
+				},
+				"paint": {
+					"fill-color": "#8c96c6",
+					'fill-opacity':0.7
+					} 
+
+			});
+			
+		});
+var toggleableLayerIds = ['Sandy Innundation Zone', '100 Year Flood', '500 Year Flood'];
+ 
+for (var i = 0; i < toggleableLayerIds.length; i++) {
+	var id = toggleableLayerIds[i];
+ 
+	var link = document.createElement('a');
+	link.href = '#';
+	link.className = 'active';
+	link.textContent = id;
+ 
+	link.onclick = function (e) {
+		var clickedLayer = this.textContent;
+		e.preventDefault();
+		e.stopPropagation();
+ 
+		var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+ 
+		if (visibility === 'visible') {
+			map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+			this.className = '';
+		} else {
+			this.className = 'active';
+			map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+		}
+	};
+ 
+	var layers = document.getElementById('menu');
+	layers.appendChild(link);
+}
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl());
+ 
+	</script>
+
+
+	
+
+	
+ 
+</body>
+</html>
